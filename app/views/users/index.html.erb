@@ -1,8 +1,81 @@
-<div style="height:200px; width:0px;"></div>
+<h2>ScrollPaginate</h2>
+<strong>Rails plugin for js scroll pagination. Inspired by ActiveScaffold</strong>
+<p>Copyright (c) 2010 Rajib Chowdhury, released under the MIT license</p>
+
+<h2>Installation<h2>
+<%= CodeRay.scan(".\/script\/plugin install git@github.com\:rajib\/scroll_paginate\.git", :ruby).div %>
+
+<h2>Example</h2>
+<strong>Controller</strong>
+
+<%= CodeRay.scan("class UsersController < ApplicationController
+  # GET /users
+  # GET /users.xml
+  def index
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @users }
+    end
+  end
+
+  # fetch_by_offset_users
+  # GET    /users/fetch_by_offset
+  def fetch_by_offset
+    respond_to do |format|
+      format.js { render :partial => 'fetch_by_offset', :locals => {:page => params[:page]} }
+    end
+  end
+end", :ruby).div(:line_numbers => :table) %>
+
+<strong>View Helper</strong>
+
+<%= CodeRay.scan("module UsersHelper
+  def generate_list(num, page=nil)
+    offset = calculate_offset(num, page)
+
+    # AR stuffs
+    collection = User.find(:all, :limit => num, :offset => offset)
+    #
+
+    content = []
+    for i in collection
+      content << \"<li> \#{i.name} </li>\"
+    end
+
+    sleep(2)
+    return content
+  end
+end", :ruby).div(:line_numbers => :table) %>
+
+<strong>Views</strong>
+
+layouts/application.html.erb
+
+<%= CodeRay.scan("<head>
+  \<\%\= javascript_include_tag(\'jquery\') \%\>
+  \<\%\= include_scroll_paginate \%\>
+  \<\%\= scroll_paginate(:url => \"/users/fetch_by_offset\",
+                      :total_results => 200,
+                      :container => \"mycontainer\",
+                      :per_page => 20, :pager_var => \"page\") \%\>
+
+</head>", :ruby).div(:line_numbers => :table) %>
+
+users/index.html.erb
+
+<%= CodeRay.scan("<ol id=\"mycontainer\">
+  \<\%\= generate_list(20) \%\>
+</ol>", :ruby).div(:line_numbers => :table) %>
+
+users/_fetch_by_offset.erb
+
+<%= CodeRay.scan("\<\%\= generate_list(20, page) \%\>", :ruby).div(:line_numbers => :table) %>
+
+
+<div style="height:100px; width:0px;"></div>
 <h2>Demo</h2>
 <%= link_to "Add new user", new_user_path %>
 
 <ol id="mycontainer">
   <%= generate_list(20) %>
 </ol>
-
